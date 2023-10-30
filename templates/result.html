@@ -1,0 +1,156 @@
+{% load static %}
+{% static "images" as baseUrl%}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        
+        <!-- SEO Meta Tags -->
+        <meta name="description" content="Your description ">
+        <meta name="author" content="Your name">
+
+        <!-- OG Meta Tags to improve the way the post looks when you share the page on Facebook, Twitter, LinkedIn -->
+        <meta property="og:site_name" content="" /> <!-- website name -->
+        <meta property="og:site" content="" /> <!-- website link -->
+        <meta property="og:title" content=""/> <!-- title shown in the actual shared post -->
+        <meta property="og:description" content="" /> <!-- description shown in the actual shared post -->
+        <meta property="og:image" content="" /> <!-- image link, make sure it's jpg -->
+        <meta property="og:url" content="" /> <!-- where do you want your post to link to -->
+        <meta name="twitter:card" content="summary_large_image"> <!-- to have large image post format in Twitter -->
+
+        <!-- Webpage Title -->
+        <title>Weather App</title>
+        
+        <!-- Styles -->
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+        <link href="{% static 'css/result.css' %}" rel="stylesheet">
+        <link href= "https://use.fontawesome.com/releases/v5.3.1/css/all.css" >
+        
+        <!-- Favicon  -->
+        <link rel="icon" href="images/favicon.png">
+    </head>
+    <body>
+      
+        <div class='box'>
+          <div class="weathercon"><img src="http://openweathermap.org/img/w/{{ data.icon }}.png" alt="Weather icon">
+            <p style=" color: yellow;">{{ data.weather }}</p>
+          </div>
+          <h2 style=" color: white;" class="location">{{ data.city }}</h2>
+            <div class='wave -one'></div>
+            <div class='wave -two'></div>
+            <div class='wave -three'></div>
+            
+            
+            <h3 style=" color: brown;" class="location">{{ data.date_time }}</h3>
+            <div class="info">
+              
+                <h1 style=" margin-top: 100px;" class="temp">{{ data.celcius_temperature}}&deg;C | {{ data.kelvin_temperature}}&deg;F</h1>
+              
+            </div>
+          </div>
+
+
+        </body>
+        </html>
+
+
+    <script>
+        $(document).ready(function() {
+            navigator.geolocation.getCurrentPosition(success, error);
+          
+            function success(pos) {
+              var lat = pos.coords.latitude;
+              var long = pos.coords.longitude;
+              weather(lat, long);
+            }
+          
+            function error() {
+              console.log("There was an error");
+            }
+          
+            function weather(lat, long) {
+              var URL = `https://fcc-weather-api.glitch.me/api/current?lat=${lat}&lon=${long}`;
+              $.getJSON(URL, function(data) {
+                display(data);
+              });
+            }
+          
+            function display(data) {
+              var city = data.name.toUpperCase();
+              var temp =
+                Math.round(data.main.temp_max) +
+                "&deg; C | " +
+                Math.round(Math.round(data.main.temp_max) * 1.8 + 32) +
+                "&deg; F";
+              var desc = data.weather[0].description;
+              var date = new Date();
+          
+              var months = [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+              ];
+          
+              var weekday = new Array(7);
+              weekday[0] = "Sunday";
+              weekday[1] = "Monday";
+              weekday[2] = "Tuesday";
+              weekday[3] = "Wednesday";
+              weekday[4] = "Thursday";
+              weekday[5] = "Friday";
+              weekday[6] = "Saturday";
+          
+              var font_color;
+              var bg_color;
+              if (Math.round(data.main.temp_max) > 25) {
+                font_color = "#d36326";
+                bg_color = "#f3f5d2";
+              } else {
+                font_color = "#44c3de";
+                bg_color = "#eff3f9";
+              }
+          
+              if (data.weather[0].main == "Sunny" || data.weather[0].main == "sunny") {
+                $(".weathercon").html(
+                  "<i class='fas fa-sun' style='color: #d36326;'></i>"
+                );
+              } else {
+                $(".weathercon").html(
+                  "<i class='fas fa-cloud' style='color: #44c3de;'></i>"
+                );
+              }
+          
+              var minutes =
+                date.getMinutes() < 11 ? "0" + date.getMinutes() : date.getMinutes();
+              var date =
+                weekday[date.getDay()].toUpperCase() +
+                " | " +
+                months[date.getMonth()].toUpperCase().substring(0, 3) +
+                " " +
+                date.getDate() +
+                " | " +
+                date.getHours() +
+                ":" +
+                minutes;
+              $(".location").html(city);
+              $(".temp").html(temp);
+              $(".date").html(date);
+              $(".box").css("background", bg_color);
+              $(".location").css("color", font_color);
+              $(".temp").css("color", font_color);
+            }
+          });
+        </script>
+
+      <script href= "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js "></script>
